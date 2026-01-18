@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="bg">
+<head>
+    <meta charset="UTF-8">
+    <title>Родинознание: Къщата на въпросите</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(180deg, #76b852 0%, #f2f21a 100%);
+            margin: 0; font-family: 'Montserrat', sans-serif;
+            height: 100vh; display: flex; flex-direction: column; overflow: hidden;
+        }
+
+        /* РЕЛЕФЕН БЯЛ НАДПИС */
+        .main-header {
+            text-align: center; padding: 25px 0;
+            color: white; font-size: 4.5rem; text-transform: uppercase;
+            text-shadow: 3px 3px 0px #7f8c8d, 6px 6px 15px rgba(0,0,0,0.2);
+            letter-spacing: 2px;
+        }
+
+        .grid-container {
+            display: grid; grid-template-columns: repeat(5, 1fr);
+            grid-template-rows: repeat(2, 1fr); gap: 15px; padding: 20px; flex-grow: 1;
+        }
+
+        .sector-rect {
+            background: white; border-radius: 20px; display: flex;
+            justify-content: center; align-items: center; font-size: 5.5rem;
+            cursor: pointer; box-shadow: 0 12px 0 rgba(0,0,0,0.1); transition: 0.15s;
+            border: 5px solid rgba(255,255,255,0.8);
+        }
+
+        .visited {
+            background: #e0e0e0 !important; color: #999 !important;
+            opacity: 0.3; box-shadow: none !important; cursor: default;
+        }
+
+        /* МОДАЛЕН ЕКРАН */
+        .modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #ffffff; z-index: 1000; flex-direction: column;
+        }
+
+        .modal-header {
+    height: 18%; /* Леко намаляваме височината на главата */
+    background: #fdfdfd; 
+    display: flex; 
+    flex-direction: column;
+    justify-content: center; 
+    align-items: center; 
+    border-bottom: 4px solid #eee;
+    padding: 5px; /* Намален от 10 на 5 */
+    text-align: center;
+}
+
+.modal-header h2 { 
+    margin: 0; 
+    color: #e91e63; 
+    font-size: 1.8rem; /* Леко намален размер на "СЕКТОР..." */
+    text-transform: uppercase; 
+}
+
+.modal-header p { 
+    margin: 5px 0 0; /* Намален от 15 на 5 - това е разстоянието между сектора и въпроса */
+    font-size: 2.2rem; /* Леко намален, за да не бута всичко надолу */
+    color: #1a1a1a; 
+    line-height: 1.1; /* Сгъстяваме редовете на самия въпрос */
+}
+        /* 3D ЕФЕКТ НА КАРТАТА */
+        .modal-body {
+            height: 60%; display: grid; grid-template-columns: 1.4fr 1fr;
+            gap: 40px; padding: 30px; align-items: center; position: relative;
+        }
+
+        .img-zone { height: 100%; perspective: 1500px; display: flex; justify-content: center; align-items: center; }
+
+        .card-inner {
+            position: relative; width: 100%; height: 100%;
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .is-flipped { transform: rotateY(180deg); }
+
+        .card-front, .card-back {
+            position: absolute; width: 100%; height: 100%;
+            backface-visibility: hidden; border-radius: 20px;
+            display: flex; justify-content: center; align-items: center;
+        }
+
+        .card-front img { max-width: 100%; max-height: 100%; border-radius: 20px; border: 8px solid #f0f0f0; }
+
+        .card-back {
+            background: #e8f5e9; color: #2e7d32; transform: rotateY(180deg);
+            padding: 30px; font-size: 2.8rem; font-weight: 900; text-align: center;
+            border: 8px solid #4caf50; box-sizing: border-box;
+        }
+
+        .hints-zone {
+            background: #fff8e1; border: 8px dashed #ffc107;
+            border-radius: 30px; padding: 30px; height: 90%;
+        }
+        .hints-zone h3 { font-size: 2.2rem; color: #ff8f00; margin-top: 0; }
+        .hints-zone li { font-size: 2.8rem; margin: 20px 0; color: #222; text-transform: uppercase; list-style-type: "✔ "; }
+
+        .modal-footer {
+            height: 20%; background: #f1f1f1; display: flex;
+            justify-content: center; align-items: center; gap: 60px; border-top: 4px solid #ddd;
+        }
+
+        .btn {
+            padding: 20px 80px; font-size: 2.5rem; border-radius: 60px;
+            border: none; cursor: pointer; font-family: 'Montserrat'; font-weight: 900;
+        }
+        .btn-check { background: #4caf50; color: white; box-shadow: 0 10px 0 #2e7d32; }
+        .btn-close { background: #f44336; color: white; box-shadow: 0 10px 0 #b71c1c; }
+    </style>
+</head>
+<body>
+
+    <div class="main-header">КЪЩАТА НА ВЪПРОСИТЕ</div>
+
+    <div class="grid-container">
+        <div class="sector-rect" style="background:#ff8a80" onclick="openBox(1, this)">1</div>
+        <div class="sector-rect" style="background:#81d4fa" onclick="openBox(2, this)">2</div>
+        <div class="sector-rect" style="background:#a5d6a7" onclick="openBox(3, this)">3</div>
+        <div class="sector-rect" style="background:#fff59d" onclick="openBox(4, this)">4</div>
+        <div class="sector-rect" style="background:#ce93d8" onclick="openBox(5, this)">5</div>
+        <div class="sector-rect" style="background:#ffcc80" onclick="openBox(6, this)">6</div>
+        <div class="sector-rect" style="background:#80cbc4" onclick="openBox(7, this)">7</div>
+        <div class="sector-rect" style="background:#f48fb1" onclick="openBox(8, this)">8</div>
+        <div class="sector-rect" style="background:#9fa8da" onclick="openBox(9, this)">9</div>
+        <div class="sector-rect" style="background:#c5e1a5" onclick="openBox(10, this)">10</div>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-header">
+            <h2 id="mType">СЕКТОР</h2>
+            <p id="mQuest">ВЪПРОС</p>
+        </div>
+        <div class="modal-body">
+            <div class="img-zone">
+                <div id="flipCard" class="card-inner">
+                    <div class="card-front"><img id="mImg" src=""></div>
+                    <div class="card-back" id="mAns">ОТГОВОР</div>
+                </div>
+            </div>
+            <div class="hints-zone">
+                <h3>ПОДСКАЗКИ:</h3>
+                <ul id="mHints"></ul>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn btn-check" onclick="showAns()">ПРОВЕРИ</button>
+            <button class="btn btn-close" onclick="closeBox()">ЗАТВОРИ</button>
+        </div>
+    </div>
+
+<script>
+  const data = {
+        1: { 
+            type: "СЕКТОР МАГЬОСНИК", 
+            quest: "Огледай се вълшебнико! Кои са частите на това растение? Разкажи какво знаеш за тях.", 
+            img: "1.png", 
+            hints: ["КОРЕНИ", "СТВОЛ", "КОРОНА"], 
+            ans: "ТОВА Е ЯБЪЛКОВО ДЪРВО. ТО ИМА ЗДРАВИ КОРЕНИ, ДЕБЕЛ СТВОЛ И ГОЛЯМА КОРОНА С ЛИСТА." 
+        },
+        2: { 
+            type: "СЕКТОР ГРЕШКА", 
+            quest: "Внимавай! Какво е сбъркал художникът на тази картинка? Можеш ли да обясниш?", 
+            img: "2.png", 
+            hints: ["БОР", "ЛИСТА", "ГРЕШКА"], 
+            ans: "ГРЕШКА! БОРЪТ Е ИГЛОЛИСТНО ДЪРВО. ТОЙ ИМА ИГЛИЧКИ, А НЕ ТАКИВА ШИРОКИ ЖЪЛТИ ЛИСТА." 
+        },
+        3: { 
+            type: "СЕКТОР ИНТЕРВЮ", 
+            quest: "Представи си, че си този храст. Разкажи ни за себе си! Помогни си с думичките.", 
+            img: "3.png", 
+            hints: ["НИСЪК", "БОДЛИ", "ШИПКА"], 
+            ans: "АЗ СЪМ ХРАСТ ШИПКА. ИМАМ МНОГО ТЪНКИ СТЪБЛА, ОСТРИ БОДЛИ И СЪМ ПО-НИСЪК ОТ ДЪРВЕТАТА." 
+        },
+        4: { 
+            type: "СЕКТОР МАГЬОСНИК", 
+            quest: "Къде растат тези растения и как ги наричаме? Разкажи какво знаеш за тях.", 
+            img: "4.png", 
+            hints: ["ГРАДИНА", "ЗЕЛЕНЧУЦИ", "КУЛТУРНИ"], 
+            ans: "ТОВА СА КУЛТУРНИ РАСТЕНИЯ (ЗЕЛЕНЧУЦИ). ХОРАТА ГИ ОТГЛЕЖДАТ В ГРАДИНИТЕ И СЕ ГРИЖАТ ЗА ТЯХ." 
+        },
+        5: { 
+            type: "СЕКТОР РАЗКАЗВАЧ", 
+            quest: "Кое е това цвете и кога се появява за първи път? От коя група е то? Разкажи.", 
+            img: "5.png", 
+            hints: ["ПРОЛЕТ", "КОКИЧЕ", "ДИВОРАСТЯЩО"], 
+            ans: "ТОВА Е КОКИЧЕ. ТО Е ПЪРВОТО ДИВОРАСТЯЩО ПРОЛЕТНО ЦВЕТЕ, КОЕТО ПОНИКВА ПОД СНЕГА." 
+        },
+        6: { 
+            type: "СЕКТОР ИНТЕРВЮ", 
+            quest: "Какво е по-специалното при стъблото на това цвете? Разкажи какво знаеш за него.", 
+            img: "6.png", 
+            hints: ["ЛАЛЕ", "ТРЕВИСТО", "МЕКО СТЪБЛО"], 
+            ans: "ЛАЛЕТО Е ТРЕВИСТО РАСТЕНИЕ. НЕГОВОТО СТЪБЛО Е МЕКО, ЗЕЛЕНО И СОЧНО." 
+        },
+        7: { 
+            type: "СЕКТОР ГРЕШКА", 
+            quest: "Може ли това растение да живее в езерото? Обясни къде трябва да го пренесем.", 
+            img: "7.png", 
+            hints: ["КАКТУС", "ПУСТИНЯ", "ВОДА"], 
+            ans: "ГРЕШКА! КАКТУСЪТ ОБИЧА ГОРЕЩИ И СУХИ МЕСТА. ТОЙ ЩЕ ЗАГИНЕ, АКО ЖИВЕЕ ВЪВ ВОДАТА." 
+        },
+        8: { 
+            type: "СЕКТОР МАГЬОСНИК", 
+            quest: "Какво чудо се случва с това малко семенце? Разкажи какво знаеш за растежа.", 
+            img: "8.png", 
+            hints: ["СЕМЕ", "ПОНИКВАНЕ", "РАСТЕЖ"], 
+            ans: "ОТ МАЛКОТО СЕМЕ ПОНИКВА КЪЛН, КОЙТО С ПОМОЩТА НА ВОДАТА И СЛЪНЦЕТО СТАВА НОВО РАСТЕНИЕ." 
+        },
+        9: { 
+            type: "СЕКТОР РАЗКАЗВАЧ", 
+            quest: "Защо растенията са най-добрите приятели на хората? Обясни.", 
+            img: "9.png", 
+            hints: ["ВЪЗДУХ", "ХРАНА", "СЯНКА"], 
+            ans: "РАСТЕНИЯТА НИ ДАВАТ ЧИСТ ВЪЗДУХ, ЗА ДА ДИШАМЕ, ВКУСНА ХРАНА И ДЕБЕЛА СЯНКА ПРЕЗ ЛЯТОТО." 
+        },
+        10: { 
+            type: "СЕКТОР ИНТЕРВЮ", 
+            quest: "Как децата помагат на природата да бъде красива? Разкажи за грижите към тях.", 
+            img: "10.png", 
+            hints: ["ГРИЖА", "ПОЛИВАНЕ", "ОБИЧ"], 
+            ans: "НИЕ СЕ ГРИЖИМ ЗА РАСТЕНИЯТА, КАТО ГИ ПОЛИВАМЕ РЕДОВНО И ГИ ПАЗИМ, ЗАЩОТО ГИ ОБИЧАМЕ." 
+        }
+    };
+
+    let activeBtn = null;
+
+    function openBox(id, btn) {
+        if(btn.classList.contains('visited')) return;
+        activeBtn = btn;
+        document.getElementById('flipCard').classList.remove('is-flipped');
+        const item = data[id];
+        document.getElementById('mType').innerText = item.type;
+        document.getElementById('mQuest').innerText = item.quest;
+        document.getElementById('mImg').src = item.img;
+        document.getElementById('mAns').innerText = item.ans;
+        document.getElementById('mHints').innerHTML = item.hints.map(h => `<li>• ${h}</li>`).join('');
+        document.getElementById('modal').style.display = 'flex';
+    }
+
+    function showAns() {
+        document.getElementById('flipCard').classList.add('is-flipped');
+    }
+
+    function closeBox() {
+        document.getElementById('modal').style.display = 'none';
+        if(activeBtn) activeBtn.classList.add('visited');
+    }
+</script>
+</body>
+</html>
